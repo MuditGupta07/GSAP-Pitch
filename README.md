@@ -13,7 +13,7 @@ It showcases:
 - JavaScript
 
 ## 🌐 Live Demo
-[Click here to view the website](https://your-github-username.github.io/gsap-intro-site/)  
+[Click here to view the website](https://muditgupta07.github.io/GSAP-Pitch/)
 (Replace with actual link once deployed)
 
 ## 📌 Purpose
