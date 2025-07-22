@@ -14,7 +14,6 @@ It showcases:
 
 ## 🌐 Live Demo
 [Click here to view the website](https://muditgupta07.github.io/GSAP-Pitch/)
-(Replace with actual link once deployed)
 
 ## 📌 Purpose
 This website was designed to uniquely answer the question:  
