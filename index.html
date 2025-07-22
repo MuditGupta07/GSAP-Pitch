@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mudit Gupta - Google Student Ambassador 2025</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            color: #333;
+            line-height: 1.6;
+            /* Custom Cursor:
+               1. Download the cursor image (e.g., cursor_11447208.png) from the provided Flaticon link.
+               2. Place it in an 'images' folder in the same directory as this HTML file.
+               3. Ensure the path below matches your downloaded file name.
+            */
+            cursor: src='images/cursor_11447208.png'; /* Your selected custom cursor */
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .header-bg {
+            background-color: #e0f2f7; /* Lighter blue for header */
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+            padding-bottom: 3rem;
+        }
+        .question-card {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer; /* Keep pointer for clickable cards */
+            border: 2px solid transparent; /* Default border */
+        }
+        .question-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            border-color: #4285F4; /* Google Blue on hover */
+        }
+        .question-card.active {
+            border-color: #4285F4; /* Google Blue when active */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+        .modal-content-wrapper { /* New wrapper for positioning avatar and bubble together */
+            position: absolute; /* Will be positioned dynamically */
+            display: flex;
+            align-items: flex-end; /* Align avatar and bubble at the bottom */
+            justify-content: flex-start; /* Default alignment */
+            animation: fadeInScale 0.3s ease-out forwards;
+            padding: 20px; /* Padding to ensure elements don't touch edges */
+            box-sizing: border-box;
+            min-width: 100px; /* Smallest possible to get offsetWidth */
+            min-height: 100px; /* Smallest possible to get offsetHeight */
+            /* Ensure content doesn't overflow this wrapper */
+            overflow: hidden; 
+        }
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Avatar styling for the modal */
+        .modal-avatar-img {
+            max-width: 250px; /* Adjust size as needed */
+            height: auto; /* Maintain aspect ratio */
+            object-fit: contain;
+            transition: transform 0.4s ease-out, filter 0.4s ease-out;
+            position: relative; /* Allow z-index */
+            z-index: 10; /* Ensure avatar is above speech bubble */
+            filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.3)); /* Add a subtle shadow */
+        }
+
+        /* Speech Bubble Styling */
+        .speech-bubble {
+            position: relative; /* Relative to its flex container (modal-content-wrapper) */
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            max-width: 400px; /* Max width for the bubble, adjusted for better readability */
+            text-align: left;
+            z-index: 5; /* Below avatar */
+            opacity: 0;
+            transform: scale(0.8);
+            animation: bubblePop 0.4s ease-out forwards 0.2s; /* Delay for pop effect */
+            margin-left: 20px; /* Increased separation from avatar */
+            margin-bottom: 50px; /* Lift it slightly above avatar's base */
+            display: flex; /* For question and answer alignment */
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        /* Cloud shape using pseudo-elements */
+        .speech-bubble::before,
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            z-index: -1;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* Match bubble shadow */
+        }
+
+        /* Tail for the speech bubble - points towards avatar */
+        .speech-bubble::before { /* Larger circle */
+            width: 40px;
+            height: 40px;
+            bottom: -20px;
+            left: -10px; /* Adjusted to point towards avatar's mouth */
+        }
+
+        .speech-bubble::after { /* Smaller circle */
+            width: 25px;
+            height: 25px;
+            bottom: -35px;
+            left: -25px; /* Adjusted to point towards avatar's mouth */
+        }
+
+        /* Removed right-aligned specific styles as we're fixing avatar to left */
+
+        @keyframes bubblePop {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Google-themed button styles */
+        .google-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px; /* Fully rounded */
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .google-button.blue {
+            background-color: #4285F4; /* Google Blue */
+            color: white;
+        }
+        .google-button.blue:hover {
+            background-color: #357ae8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .google-button.red {
+            background-color: #EA4335; /* Google Red */
+            color: white;
+        }
+        .google-button.red:hover {
+            background-color: #d13224;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .google-button.green {
+            background-color: #34A853; /* Google Green */
+            color: white;
+        }
+        .google-button.green:hover {
+            background-color: #2b8e46;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .google-button.yellow {
+            background-color: #FBBC05; /* Google Yellow */
+            color: white; /* Or #333 if it looks better */
+        }
+        .google-button.yellow:hover {
+            background-color: #e0a704;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Social icons */
+        .social-icon {
+            font-size: 1.8rem;
+            color: #777;
+            transition: color 0.2s ease;
+        }
+        .social-icon:hover {
+            color: #4285F4; /* Google Blue */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .modal-avatar-img {
+                max-width: 150px; /* Smaller avatar on mobile */
+            }
+            .speech-bubble {
+                max-width: 85%; /* Adjust max width for mobile */
+                padding: 1rem 1.25rem; /* Smaller padding */
+                margin-bottom: 20px; /* Less lift */
+                margin-left: 10px; /* Less separation on mobile */
+            }
+            .speech-bubble::before {
+                bottom: -10px; /* Adjusted for mobile */
+                left: -5px; /* Adjusted for mobile */
+                width: 30px;
+                height: 30px;
+            }
+            .speech-bubble::after {
+                bottom: -20px; /* Adjusted for mobile */
+                left: -15px; /* Adjusted for mobile */
+                width: 18px;
+                height: 18px;
+            }
+            .modal-content-wrapper {
+                padding: 10px; /* Less padding on mobile */
+                /* For mobile, try to center the whole unit or place it consistently */
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                flex-direction: row !important; /* Always avatar then bubble on mobile */
+                align-items: flex-end; /* Keep avatar and bubble aligned at bottom */
+            }
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <!-- Header Section -->
+    <header class="header-bg text-center py-16 px-4">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4 leading-tight">
+            Want to know about me… You have came to the right place. Let's Start <span class="text-yellow-500">🎉</span>
+        </h1>
+        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+            Get to know Mudit Gupta — your next Google Student Ambassador — one question at a time!
+        </p>
+    </header>
+
+    <!-- Main Q&A Section -->
+    <main class="container py-16 flex flex-col items-center justify-center gap-12">
+        <!-- Questions Section -->
+        <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
+            <!-- Question buttons will be dynamically inserted here by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Answer Modal (Hidden by default) -->
+    <div id="answerModal" class="modal-overlay fixed inset-0 items-center justify-center p-4 hidden">
+        <div id="modalContentWrapper" class="modal-content-wrapper flex">
+            <!-- Avatar and Speech Bubble will be dynamically inserted here -->
+            <div class="speech-bubble">
+                <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl font-bold leading-none">&times;</button>
+                <h3 id="modalQuestion" class="text-xl md:text-2xl font-semibold text-gray-700 mb-4"></h3>
+                <p id="modalAnswer" class="text-lg md:text-xl text-gray-800 leading-relaxed"></p>
+                <button id="replayVoiceover" class="google-button blue mt-6 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                    </svg>
+                    Replay Voiceover
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="bg-gray-800 text-white py-12 px-4 text-center rounded-tl-3xl rounded-tr-3xl">
+        <h2 class="text-2xl md:text-3xl font-bold mb-6">Wish to know more? Let’s talk!</h2>
+        <div class="flex justify-center space-x-6 mb-8">
+            <!-- LinkedIn Icon -->
+            <a href="https://www.linkedin.com/in/mudit-gupta-249677294/" target="_blank" class="social-icon hover:text-blue-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            </a>
+            <!-- GitHub Icon -->
+            <a href="https://github.com/MuditGupta07" target="_blank" class="social-icon hover:text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.08-.731.084-.716.084-.716 1.192.085 1.816 1.29 1.816 1.29 1.052 1.815 2.757 1.299 3.412.993.108-.775.418-1.299.762-1.599-2.618-.294-5.339-1.309-5.339-5.821 0-1.288.465-2.339 1.235-3.164-.12-.294-.539-1.494.129-3.11 0 0 1.009-.316 3.301 1.205 1.14-.317 2.35-.475 3.55-.48 1.199.005 2.409.163 3.55.48 2.291-1.521 3.3-1.205 3.3-1.205.669 1.616.25 2.816.12 3.11.77.825 1.235 1.876 1.235 3.164 0 4.523-2.721 5.527-5.347 5.817.427.364.817 1.096.817 2.219v3.293c0 .319.192.694.801.576c4.765-1.589 8.204-6.095 8.204-11.387c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+            <!-- Portfolio Icon (using a simple briefcase icon) -->
+            <a href="https://muditgupta07.github.io/Portfolio/" target="_blank" class="social-icon hover:text-green-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-3v-3c0-1.654-1.346-3-3-3s-3 1.346-3 3v3h-3v-3c0-1.654-1.346-3-3-3s-3 1.346-3 3v3h-3c-1.104 0-2 .896-2 2v13c0 1.104.896 2 2 2h20c1.104 0 2-.896 2-2v-13c0-1.104-.896-2-2-2zm-14 0v-3c0-.552.449-1 1-1s1 .448 1 1v3h-2zm8 0v-3c0-.552.449-1 1-1s1 .448 1 1v3h-2zm8 15h-20v-11h20v11z"/></svg>
+            </a>
+        </div>
+        <a href="mailto:muditg782005@gmail.com" class="google-button green">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+            </svg>
+            Email Me!
+        </a>
+    </footer>
+
+    <script>
+        // Data for questions, answers, and corresponding avatar poses (using provided image URLs)
+        const qnaData = [
+            {
+                question: "🎤 So… Who Are You, Really?",
+                answer: "Hi! I’m Mudit — a curious soul who fell in love with code the moment I realized I could bring ideas to life with it. Currently pursuing Computer Science Engineering, I’m always trying to strike a balance between logic and creativity. Whether it's solving DSA problems, building fun frontend projects, or helping a junior debug something strange — I'm always learning. And yes, I do talk to AI more than I talk to people (don’t judge me 😄).",
+                avatarPose: src="images/Avatar1.png" // Avatar1.png
+            },
+            {
+                question: "🎯 What Sparked Your Interest in Tech?",
+                answer: "It wasn’t a single “Eureka!” moment — it’s been a journey. From writing my first HTML page to building dynamic React interfaces, I found joy in creating something out of nothing. But what really drew me in was how technology is solving real-world problems — from education to healthcare — and I knew I wanted to be part of that impact.",
+                avatarPose: src="images/Avatar2.png" // Avatar2.png
+            },
+            {
+                question: "💡 One Strength You’re Proud Of — and One You’re Working On",
+                answer: "My biggest strength? I’m obsessed with growth. Whether it’s learning new tools, refining projects, or iterating on my resume — I don’t settle easily. My weak spot? I tend to overthink. I chase perfection and sometimes delay shipping because of it. But I’m becoming better at letting go when it’s good enough — and learning faster because of it.",
+                avatarPose: src="images/Avatar3.png" // Avatar3.png
+            },
+            {
+                question: "🎮 What Makes You Happy Outside of Coding?",
+                answer: "Plenty of things! I love writing stories and poetry — especially the kind that captures unspoken feelings. Long walks with calm music are therapy, and chess? My favorite nighttime brain exercise. Even in hobbies, I enjoy thinking deeply and expressing creatively.",
+                avatarPose: src="images/Avatar4.png" // Avatar4.png
+            },
+            {
+                question: "🏆 What Have You Achieved So Far — and Are You Happy With It?",
+                answer: "I’ve grown from someone intimidated by basic syntax to someone confidently building interactive web applications and solving real coding challenges. I’ve held leadership roles, contributed to communities, and continuously pushed my limits — even when things didn’t go as planned. Am I satisfied? Not quite — because growth doesn’t stop. But I’m proud of the journey so far, and even more excited about what’s ahead.",
+                avatarPose: src="images/Avatar5.png" // Avatar5.png
+            },
+            {
+                question: "🚀 Why Do You Want to Be a Google Student Ambassador?",
+                answer: "Because I know what it’s like to be confused, curious, and looking for the right spark — and I want to be that spark for others. I want to build a culture on campus where tech feels accessible, creative, and genuinely exciting — not intimidating. Gemini is a revolution in AI learning, and I see this program as a way to bridge that revolution to every student who dreams big but feels lost.",
+                avatarPose: src="images/Avatar1.png" // Cycle back to Avatar1.png
+            }
+        ];
+
+
+
+        // Get DOM elements
+        const questionsContainer = document.querySelector('.grid');
+        const answerModal = document.getElementById('answerModal');
+        const modalContentWrapper = document.getElementById('modalContentWrapper');
+        const closeModalBtn = document.getElementById('closeModal');
+        const modalQuestion = document.getElementById('modalQuestion');
+        const modalAnswer = document.getElementById('modalAnswer');
+        const replayVoiceoverBtn = document.getElementById('replayVoiceover');
+
+        let currentSpeechSynthesisUtterance = null; // To hold the current utterance
+        let currentAvatarElement = null; // To hold the dynamically created avatar img
+        let typingInterval = null; // To store the interval for typing effect
+
+        // Function to create question cards
+        function createQuestionCards() {
+            questionsContainer.innerHTML = ''; // Clear existing content
+            qnaData.forEach((data, index) => {
+                const card = document.createElement('button');
+                card.classList.add('question-card', 'p-6', 'text-center', 'font-semibold', 'text-gray-700', 'hover:text-blue-600', 'text-lg', 'md:text-xl');
+                card.textContent = data.question;
+                card.dataset.index = index; // Store index to retrieve data
+
+                // Add a unique color to each card for visual appeal
+                const colors = ['#4285F4', '#EA4335', '#34A853', '#FBBC05', '#673AB7', '#00BCD4']; // Google colors + some vibrant ones
+                card.style.borderColor = colors[index % colors.length]; // Apply border color
+                card.style.color = colors[index % colors.length]; // Apply text color
+                card.style.boxShadow = `0 4px 15px rgba(0, 0, 0, 0.08), 0 0 0 2px ${colors[index % colors.length]}40`; // Add a subtle glow
+
+                card.addEventListener('click', () => handleQuestionClick(index, card));
+                questionsContainer.appendChild(card);
+            });
+        }
+
+        // Function to handle question click
+        function handleQuestionClick(index, clickedCard) {
+            // Remove 'active' class from all cards
+            document.querySelectorAll('.question-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            // Add 'active' class to the clicked card
+            clickedCard.classList.add('active');
+
+            const data = qnaData[index];
+
+            // Clear previous avatar if exists and reset modal content wrapper
+            if (currentAvatarElement) {
+                currentAvatarElement.remove();
+                currentAvatarElement = null;
+            }
+            // No need to remove 'right-aligned' class, as we're fixing position
+
+            // Create new avatar element
+            const avatarImg = document.createElement('img');
+            avatarImg.src = data.avatarPose;
+            avatarImg.alt = "Mudit Gupta Avatar";
+            avatarImg.classList.add('modal-avatar-img');
+            currentAvatarElement = avatarImg; // Store reference
+
+            // Update modal question
+            modalQuestion.textContent = data.question;
+            modalAnswer.textContent = ''; // Clear answer for typing effect
+
+            // Append avatar to modal content wrapper (order matters for flexbox)
+            const speechBubble = modalContentWrapper.querySelector('.speech-bubble');
+            modalContentWrapper.insertBefore(avatarImg, speechBubble);
+
+            // Show modal first to allow elements to render and get their dimensions
+            answerModal.classList.remove('hidden');
+
+            // Position the avatar and speech bubble
+            positionAvatarAndBubble();
+
+            // Start typing effect and voiceover simultaneously
+            typeWriter(data.answer, modalAnswer);
+            speakText(data.answer);
+        }
+
+        // Typewriter effect function
+        function typeWriter(text, element) {
+            let i = 0;
+            element.textContent = ''; // Clear content before typing
+            if (typingInterval) {
+                clearInterval(typingInterval); // Clear any existing interval
+            }
+
+            typingInterval = setInterval(() => {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typingInterval);
+                    typingInterval = null;
+                }
+            }, 50); // Typing speed (milliseconds per character)
+        }
+
+        // Function to position the avatar and speech bubble
+        function positionAvatarAndBubble() {
+            const avatar = modalContentWrapper.querySelector('.modal-avatar-img');
+            const bubble = modalContentWrapper.querySelector('.speech-bubble');
+
+            if (!avatar || !bubble) return;
+
+            // Reset any previous inline styles for positioning
+            modalContentWrapper.style.left = '';
+            modalContentWrapper.style.top = '';
+            modalContentWrapper.style.transform = ''; // Clear any previous transform
+
+            // Get viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Define padding from screen edges
+            const PADDING = 40; // Minimum padding from edges
+
+            // Fixed position for the avatar and bubble group (desktop)
+            // Aim for top-left quadrant, slightly offset from center
+            const DESKTOP_LEFT_OFFSET_PERCENT = 0.15; // 15% from left
+            const DESKTOP_TOP_OFFSET_PERCENT = 0.20; // 20% from top (adjusted to move higher)
+
+            let wrapperX = viewportWidth * DESKTOP_LEFT_OFFSET_PERCENT;
+            let wrapperY = viewportHeight * DESKTOP_TOP_OFFSET_PERCENT;
+
+            // Calculate combined width/height for boundary checks
+            // Temporarily set flex-direction to row to get accurate combined width
+            modalContentWrapper.style.flexDirection = 'row';
+            bubble.style.marginLeft = '20px'; // Apply desktop margin
+            bubble.style.marginRight = '0';
+            bubble.style.order = 'unset';
+
+            // Need to force a reflow to get accurate offsetWidth/Height after flex-direction change
+            // This is a small hack, but necessary for immediate dimension calculation
+            modalContentWrapper.offsetWidth; 
+
+            const combinedWidth = modalContentWrapper.offsetWidth;
+            const combinedHeight = modalContentWrapper.offsetHeight;
+
+
+            // Ensure the wrapper stays within bounds after applying offset
+            wrapperX = Math.max(PADDING, Math.min(wrapperX, viewportWidth - combinedWidth - PADDING));
+            wrapperY = Math.max(PADDING, Math.min(wrapperY, viewportHeight - combinedHeight - PADDING));
+
+            modalContentWrapper.style.left = `${wrapperX}px`;
+            modalContentWrapper.style.top = `${wrapperY}px`;
+
+            // For mobile, override positioning to center the unit
+            if (viewportWidth <= 768) { /* Matches @media (max-width: 768px) */
+                modalContentWrapper.style.left = '50%';
+                modalContentWrapper.style.top = '50%';
+                modalContentWrapper.style.transform = 'translate(-50%, -50%)';
+                modalContentWrapper.style.flexDirection = 'row'; /* Always avatar then bubble on mobile */
+                bubble.style.marginLeft = '10px'; /* Mobile specific margin */
+                bubble.style.marginRight = '0';
+                bubble.style.order = 'unset';
+            }
+            
+            // Remove right-aligned class as it's no longer dynamically set
+            modalContentWrapper.classList.remove('right-aligned');
+        }
+
+
+        // Function to speak text using Web Speech API
+        function speakText(text) {
+            // Stop any ongoing speech
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+
+            currentSpeechSynthesisUtterance = new SpeechSynthesisUtterance(text);
+            currentSpeechSynthesisUtterance.lang = 'en-US'; // Set language
+            currentSpeechSynthesisUtterance.volume = 1; // 0 to 1
+            currentSpeechSynthesisUtterance.rate = 1;    // Normal speed
+            currentSpeechSynthesisUtterance.pitch = 1.1;   // Slightly higher pitch for a lighter/boyish tone
+
+            // Find a suitable male/boy voice
+            const voices = speechSynthesis.getVoices();
+            let selectedVoice = null;
+
+            // Prioritize voices that explicitly sound male or boyish
+            const preferredMaleVoices = [
+                'Google US English Male', // Common Google male voice
+                'Microsoft David Desktop - English (United States)', // Common Windows male voice
+                'en-US-Standard-D', // Another potential male voice
+                'en-US-Wavenet-D',
+                'en-US-Neural2-D'
+            ];
+
+            for (const name of preferredMaleVoices) {
+                selectedVoice = voices.find(voice => voice.lang === 'en-US' && voice.name.includes(name));
+                if (selectedVoice) break;
+            }
+
+            // Fallback to any male-sounding voice if preferred not found, or just the first en-US voice
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang === 'en-US' && (voice.name.includes('Male') || voice.name.includes('David') || voice.name.includes('Standard-D') || voice.name.includes('Wavenet-D') || voice.name.includes('Neural2-D')));
+            }
+
+            // Final fallback to any en-US voice
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang === 'en-US');
+            }
+
+            if (selectedVoice) {
+                currentSpeechSynthesisUtterance.voice = selectedVoice;
+            } else {
+                console.warn("No suitable male/boy voice found, using default or first available en-US voice.");
+            }
+
+            speechSynthesis.speak(currentSpeechSynthesisUtterance);
+        }
+
+        // Event listener for closing the modal
+        closeModalBtn.addEventListener('click', () => {
+            answerModal.classList.add('hidden');
+            // Stop speech when modal is closed
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+            // Stop typing effect
+            if (typingInterval) {
+                clearInterval(typingInterval);
+                typingInterval = null;
+            }
+            // Remove 'active' class from all cards when modal is closed
+            document.querySelectorAll('.question-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            // Remove avatar when modal is closed
+            if (currentAvatarElement) {
+                currentAvatarElement.remove();
+                currentAvatarElement = null;
+            }
+        });
+
+        // Event listener for replaying voiceover
+        replayVoiceoverBtn.addEventListener('click', () => {
+            if (currentSpeechSynthesisUtterance) {
+                speakText(currentSpeechSynthesisUtterance.text); // Replay the text
+            }
+        });
+
+        // Initialize the website
+        document.addEventListener('DOMContentLoaded', () => {
+            createQuestionCards();
+            // Preload voices for faster speech synthesis
+            speechSynthesis.getVoices(); // This call populates the voices array
+        });
+
+        // Add resize listener to re-position on window resize
+        window.addEventListener('resize', () => {
+            if (!answerModal.classList.contains('hidden')) {
+                positionAvatarAndBubble();
+            }
+        });
+    </script>
+</body>
+</html>
